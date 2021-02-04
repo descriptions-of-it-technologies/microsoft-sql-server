@@ -24,7 +24,7 @@ function import {
         if [ $? -eq 0 ]
         then
             echo "****************************************************************"
-            echo "SQL Serever started"
+            echo "SQL Server started"
             echo "****************************************************************"
             break
         else
@@ -35,11 +35,18 @@ function import {
         fi
     done
     sleep 1
-    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -Q "CREATE DATABASE SkarbNgoDB"
+    echo "****************************************** Database creation begins ******************************************"
+#    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -Q "CREATE DATABASE SkarbNgoDB"
+#    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -Q "CREATE DATABASE SkarbNgoDB COLLATE Cyrillic_General_CI_AS;"     #RU
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -Q "CREATE DATABASE SkarbNgoDB COLLATE Ukrainian_CI_AS;"             #UA
     /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d SkarbNgoDB -Q "CREATE LOGIN [user] WITH PASSWORD = '$MSSQL_SA_PASSWORD', CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF"
     /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d SkarbNgoDB -Q "CREATE USER [user] FOR LOGIN [user]"
     /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d SkarbNgoDB -Q "EXEC sp_addrolemember 'db_owner', 'user';"
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+
+    echo "****************************************** Show Database Collation *******************************************"
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -Q "SELECT name, collation_name FROM sys.databases;"
+
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 }
 
 import &
